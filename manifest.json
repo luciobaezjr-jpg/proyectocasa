@@ -1,0 +1,17 @@
+{
+  "name": "Control de Cuotas - Vivienda Familiar",
+  "short_name": "Mi Casa",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1e3a8a",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "logocasa.jpg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
