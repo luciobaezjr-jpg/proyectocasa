@@ -46,7 +46,6 @@
 
     .container { max-width: 1050px; margin: 0 auto; padding: 20px 16px; }
 
-    /* Alerta ventana de pago 1 al 5 */
     .alert-pago {
       background: #fef3c7;
       border-left: 5px solid var(--warning);
@@ -58,7 +57,6 @@
       font-size: 0.92rem;
     }
 
-    /* Tarjetas resumen */
     .grid-stats {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -79,7 +77,6 @@
     }
     .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.4s ease; }
 
-    /* Sección integrantes y formulario */
     .grid-two {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -109,7 +106,6 @@
     .member-info small { color: var(--muted); }
     .member-amount { font-weight: 700; color: var(--success); }
 
-    /* Formulario */
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: 600; }
     .form-group select, .form-group input {
@@ -127,7 +123,6 @@
     .btn-submit:hover { background: #1e40af; }
     .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* Listado de 37 cuotas */
     .toolbar {
       display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;
     }
@@ -181,7 +176,7 @@
 
 <header>
   <h1>🏠 Control de Cuotas - Vivienda Familiar</h1>
-  <p>37 cuotas de Gs. 5.000.000 • Vencimiento del 1 al 5 de cada mes</p>
+  <p>37 cuotas de Gs. 5M + 1 cuota final de Gs. 2.5M (Total: Gs. 187.5M)</p>
   <div class="sync-badge">
     <span class="dot" id="syncDot"></span>
     <span id="syncText">Conectando a la nube...</span>
@@ -193,7 +188,6 @@
     📅 <strong>¡Ventana de pago activa!</strong> Estamos entre el 1 y el 5 del mes. Recuerden registrar los aportes correspondientes a la cuota vigente.
   </div>
 
-  <!-- Estadísticas Globales -->
   <div class="grid-stats">
     <div class="stat-card">
       <span>Total Abonado</span>
@@ -201,12 +195,12 @@
       <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
     </div>
     <div class="stat-card">
-      <span>Saldo Restante (de Gs. 185.000.000)</span>
-      <strong id="statRestante">Gs. 185.000.000</strong>
+      <span>Saldo Restante (de Gs. 187.500.000)</span>
+      <strong id="statRestante">Gs. 187.500.000</strong>
     </div>
     <div class="stat-card">
       <span>Cuotas Completadas</span>
-      <strong id="statCuotas">0 / 37</strong>
+      <strong id="statCuotas">0 / 38</strong>
     </div>
     <div class="stat-card">
       <span>Avance General</span>
@@ -215,7 +209,6 @@
   </div>
 
   <div class="grid-two">
-    <!-- Aportes por Integrante -->
     <div class="panel">
       <h2>👨‍👩‍👦 Aportes Acumulados por Integrante</h2>
       <div id="listaIntegrantes">
@@ -223,7 +216,6 @@
       </div>
     </div>
 
-    <!-- Formulario de Registro -->
     <div class="panel">
       <h2>➕ Registrar Nuevo Aporte</h2>
       <form id="formAporte">
@@ -234,14 +226,15 @@
         <div class="form-group">
           <label for="selectIntegrante">Integrante que aporta</label>
           <select id="selectIntegrante" required>
-            <option value="Papá">Papá</option>
-            <option value="Mamá">Mamá</option>
+            <option value="Sonia">Sonia</option>
             <option value="Lucio">Lucio</option>
+            <option value="Junior">Junior</option>
+            <option value="Juan">Juan</option>
           </select>
         </div>
         <div class="form-group">
           <label for="inputMonto">Monto aportado (Guaraníes)</label>
-          <input type="number" id="inputMonto" min="1000" step="1000" placeholder="Ej: 2000000" required />
+          <input type="number" id="inputMonto" min="1000" step="1000" placeholder="Ej: 1500000" required />
           <div class="quick-btns">
             <button type="button" onclick="setMonto(1000000)">+ 1.000.000</button>
             <button type="button" onclick="setMonto(1500000)">+ 1.500.000</button>
@@ -254,10 +247,9 @@
     </div>
   </div>
 
-  <!-- Historial de 37 Cuotas -->
   <div class="panel">
     <div class="toolbar">
-      <h2 style="margin:0;">📋 Detalle de las 37 Cuotas</h2>
+      <h2 style="margin:0;">📋 Detalle de las 38 Cuotas</h2>
       <button class="btn-export" onclick="exportarCSV()">📥 Exportar a Excel (CSV)</button>
     </div>
     <div id="listaCuotas">Cargando cronograma...</div>
@@ -265,18 +257,16 @@
 </div>
 
 <script>
-  // Configuración de Supabase
   const SUPABASE_URL = 'https://xgnszpsxlnfzjfkyxpdx.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_W4OuwKeHkqVKG_CX34XAjQ_WZrpDlGn';
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   let cuotasData = [];
   let aportesData = [];
-  const TOTAL_VIVIENDA = 37 * 5000000; // 185.000.000 Gs.
+  const TOTAL_VIVIENDA = 187500000; // 187.5M Gs.
 
   const formatGs = (num) => 'Gs. ' + Number(num || 0).toLocaleString('es-PY');
 
-  // Verificar si hoy es entre el 1 y el 5 del mes
   function verificarVentanaPago() {
     const dia = new Date().getDate();
     if (dia >= 1 && dia <= 5) {
@@ -284,7 +274,6 @@
     }
   }
 
-  // Cargar datos desde Supabase
   async function cargarDatos() {
     try {
       const [resCuotas, resAportes] = await Promise.all([
@@ -324,11 +313,11 @@
 
     document.getElementById('statPagado').textContent = formatGs(totalPagado);
     document.getElementById('statRestante').textContent = formatGs(saldoRestante);
-    document.getElementById('statCuotas').textContent = `${cuotasCompletas} / 37`;
+    document.getElementById('statCuotas').textContent = `${cuotasCompletas} / 38`;
     document.getElementById('statPorcentaje').textContent = `${porcentaje}%`;
     document.getElementById('progressBar').style.width = `${Math.min(100, porcentaje)}%`;
 
-    const integrantes = ['Papá', 'Mamá', 'Lucio'];
+    const integrantes = ['Sonia', 'Lucio', 'Junior', 'Juan'];
     const contIntegrantes = document.getElementById('listaIntegrantes');
     contIntegrantes.innerHTML = '';
 
@@ -363,7 +352,7 @@
 
       const opt = document.createElement('option');
       opt.value = c.id;
-      opt.textContent = `Cuota ${c.numero_cuota} - ${c.mes_anio} (${falta === 0 ? 'Completa' : 'Falta ' + formatGs(falta)})`;
+      opt.textContent = `Cuota ${c.numero_cuota} - ${c.mes_anio} [Obj: ${formatGs(c.monto_objetivo)}] (${falta === 0 ? 'Completa' : 'Falta ' + formatGs(falta)})`;
       select.appendChild(opt);
     });
 
